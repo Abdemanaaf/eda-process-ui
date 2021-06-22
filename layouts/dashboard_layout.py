@@ -6,9 +6,8 @@ dashboard_layout = html.Div([
     html.Div([
         dbc.Row([
             dbc.Col([
-                html.P(['Upload Files Here:']),
-
-                html.P(['Input Files:']),
+                html.P(['Upload Input File & Preview Table']),
+                html.P(['File Types Allowed - xlsx, csv']),
 
                 dcc.Upload(
                     children=html.Div(['Drag and Drop or ', html.A('Select Files')]),
@@ -26,7 +25,8 @@ dashboard_layout = html.Div([
                     dbc.Button('Clear Table', color='light', className='mr-1', id='clear_input_table', n_clicks=0),
                 ], id='clear_input_btn_div'),
 
-                html.P(['Mapping Files:']),
+                html.P(['Upload Mapping File & Preview Table']),
+                html.P(['File Types Allowed - xlsx, csv']),
 
                 dcc.Upload(
                     children=html.Div(['Drag and Drop or ', html.A('Select Files')]),

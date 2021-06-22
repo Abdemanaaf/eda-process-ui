@@ -16,22 +16,50 @@ from layouts.eda_layout import eda_layout
 from layouts.sneek_peek_layout import get_sneek_peek_layout
 from layouts.add_func_layout import add_func_layout
 from layouts.output_layout import output_layout
+from layouts.nav_layout import left_side_nav_layout, top_navbar_layout
 
 from src.utils import parse_contents
 from src.config import config
 
+external_scripts = [
+    'https://www.google-analytics.com/analytics.js',
+    {
+        'src': 'https://cdn.polyfill.io/v2/polyfill.min.js'
+    },
+    {
+        'src': 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js',
+        'integrity': 'sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM',
+        'crossorigin': 'anonymous'
+    }
+]
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes.BOOTSTRAP]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+external_stylesheets = [
+    'https://codepen.io/chriddyp/pen/bWLwgP.css',
+    {
+        'href': 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css',
+        'rel': 'stylesheet',
+        'integrity': 'sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC',
+        'crossorigin': 'anonymous'
+    },
+    dbc.themes.BOOTSTRAP
+]
+
+app = dash.Dash(
+    __name__,
+    external_scripts=external_scripts,
+    external_stylesheets=external_stylesheets,
+    title='Ease EDA'
+)
+
 app.config.suppress_callback_exceptions = True
 
 server = app.server
 
-input_table_rows_list = []
-mapping_table_rows_list = []
+INPUT_TABLE_ROWS_LIST = []
+MAPPING_TABLE_ROWS_LIST = []
 
-function_number = 0
-func_list = {
+FUNCTION_NUMBER = 0
+FUNCTION_LIST = {
     'add_new_row': html.Div(
         [
             dcc.Link(
@@ -46,15 +74,27 @@ func_list = {
     )
 }
 
-new_function_added = False
-process_dict = {}
-process_list = []
+NEW_FUNCTION_ADDED = False
+NEW_PROCESS_DICTIONARY = {}
+ALL_PROCESS_LIST = []
+
 
 app.layout = html.Div([
     dcc.Location(id='route_url', refresh=False),
 
-    html.Div(id='page_content')
-])
+    dbc.Row([
+        dbc.Col([top_navbar_layout])
+    ], className='mb-5'),
+
+    dbc.Container([
+        dbc.Row([
+            dbc.Col([], width=1),
+            dbc.Col([left_side_nav_layout], width=2),
+            dbc.Col([html.Div(id='page_content')], width=8),
+            dbc.Col([], width=1)
+        ], className='mt-5, mr-5')
+    ], fluid=True, className='mr-5 ml-5')
+], style={'background-color': '#e2eee5', 'height': '100vh'})
 
 
 @app.callback(
@@ -72,7 +112,7 @@ app.layout = html.Div([
     ]
 )
 def update_mapping_table(list_of_contents, nclicks, list_of_names, list_of_dates):
-    global mapping_table_rows_list
+    global MAPPING_TABLE_ROWS_LIST
 
     table_header = [
         html.Thead(html.Tr([
@@ -91,22 +131,22 @@ def update_mapping_table(list_of_contents, nclicks, list_of_names, list_of_dates
 
     if list_of_contents is not None:
         for sr_no, contents, filename, date in zip(list(range(len(list_of_contents))), list_of_contents, list_of_names, list_of_dates):
-            mapping_table_rows_list.append(parse_contents(contents, filename, date))
+            MAPPING_TABLE_ROWS_LIST.append(parse_contents(contents, filename, date))
 
-            mapping_table_rows_list[sr_no][2].to_csv(Path('media/mapping_files/', filename), index=False)
+            MAPPING_TABLE_ROWS_LIST[sr_no][2].to_csv(Path('media/mapping_files/', filename), index=False)
 
             table_rows.append(html.Tr([
                 html.Td(sr_no),
-                html.Td(mapping_table_rows_list[sr_no][0]),
-                html.Td(mapping_table_rows_list[sr_no][1]),
-                html.Td(mapping_table_rows_list[sr_no][3]),
-                html.Td(mapping_table_rows_list[sr_no][4]),
+                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][0]),
+                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][1]),
+                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][3]),
+                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][4]),
                 html.Td(
-                    dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{mapping_table_rows_list[sr_no][0]}/{mapping_table_rows_list[sr_no][4]}')
+                    dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{MAPPING_TABLE_ROWS_LIST[sr_no][0]}/{MAPPING_TABLE_ROWS_LIST[sr_no][4]}')
                 ),
             ]))
     else:
-        if mapping_table_rows_list == []:
+        if MAPPING_TABLE_ROWS_LIST == []:
             table_rows.append(html.Tr([
                 html.Td('Empty Cell'),
                 html.Td('Empty Cell'),
@@ -116,22 +156,22 @@ def update_mapping_table(list_of_contents, nclicks, list_of_names, list_of_dates
                 html.Td('Empty Cell'),
             ]))
         else:
-            for row in range(len(mapping_table_rows_list)):
+            for row in range(len(MAPPING_TABLE_ROWS_LIST)):
                 table_rows.append(html.Tr([
                     html.Td(row),
-                    html.Td(mapping_table_rows_list[row][0]),
-                    html.Td(mapping_table_rows_list[row][1]),
-                    html.Td(mapping_table_rows_list[row][3]),
-                    html.Td(mapping_table_rows_list[row][4]),
+                    html.Td(MAPPING_TABLE_ROWS_LIST[row][0]),
+                    html.Td(MAPPING_TABLE_ROWS_LIST[row][1]),
+                    html.Td(MAPPING_TABLE_ROWS_LIST[row][3]),
+                    html.Td(MAPPING_TABLE_ROWS_LIST[row][4]),
                     html.Td(
-                        dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{mapping_table_rows_list[row][0]}/{mapping_table_rows_list[row][4]}')
+                        dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{MAPPING_TABLE_ROWS_LIST[row][0]}/{MAPPING_TABLE_ROWS_LIST[row][4]}')
                     ),
                 ]))
 
     if nclicks != 0:
         btn_obj = dbc.Button('Clear Table', color='light', className='mr-1', id='clear_mapping_table', n_clicks=0)
 
-        mapping_table_rows_list = []
+        MAPPING_TABLE_ROWS_LIST = []
 
         table_rows = [
             html.Tr([
@@ -165,7 +205,7 @@ def update_mapping_table(list_of_contents, nclicks, list_of_names, list_of_dates
     ]
 )
 def update_input_table(list_of_contents, nclicks, list_of_names, list_of_dates):
-    global input_table_rows_list
+    global INPUT_TABLE_ROWS_LIST
 
     table_header = [
         html.Thead(html.Tr([
@@ -184,22 +224,22 @@ def update_input_table(list_of_contents, nclicks, list_of_names, list_of_dates):
 
     if list_of_contents is not None:
         for sr_no, contents, filename, date in zip(list(range(len(list_of_contents))), list_of_contents, list_of_names, list_of_dates):
-            input_table_rows_list.append(parse_contents(contents, filename, date))
+            INPUT_TABLE_ROWS_LIST.append(parse_contents(contents, filename, date))
 
-            input_table_rows_list[sr_no][2].to_csv(Path('media/csv_files/', filename), index=False)
+            INPUT_TABLE_ROWS_LIST[sr_no][2].to_csv(Path('media/csv_files/', filename), index=False)
 
             table_rows.append(html.Tr([
                 html.Td(sr_no),
-                html.Td(input_table_rows_list[sr_no][0]),
-                html.Td(input_table_rows_list[sr_no][1]),
-                html.Td(input_table_rows_list[sr_no][3]),
-                html.Td(input_table_rows_list[sr_no][4]),
+                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][0]),
+                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][1]),
+                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][3]),
+                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][4]),
                 html.Td(
-                    dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{input_table_rows_list[sr_no][0]}/{input_table_rows_list[sr_no][4]}')
+                    dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{INPUT_TABLE_ROWS_LIST[sr_no][0]}/{INPUT_TABLE_ROWS_LIST[sr_no][4]}')
                 ),
             ]))
     else:
-        if input_table_rows_list == []:
+        if INPUT_TABLE_ROWS_LIST == []:
             table_rows.append(html.Tr([
                 html.Td('Empty Cell'),
                 html.Td('Empty Cell'),
@@ -209,22 +249,22 @@ def update_input_table(list_of_contents, nclicks, list_of_names, list_of_dates):
                 html.Td('Empty Cell'),
             ]))
         else:
-            for row in range(len(input_table_rows_list)):
+            for row in range(len(INPUT_TABLE_ROWS_LIST)):
                 table_rows.append(html.Tr([
                     html.Td(row),
-                    html.Td(input_table_rows_list[row][0]),
-                    html.Td(input_table_rows_list[row][1]),
-                    html.Td(input_table_rows_list[row][3]),
-                    html.Td(input_table_rows_list[row][4]),
+                    html.Td(INPUT_TABLE_ROWS_LIST[row][0]),
+                    html.Td(INPUT_TABLE_ROWS_LIST[row][1]),
+                    html.Td(INPUT_TABLE_ROWS_LIST[row][3]),
+                    html.Td(INPUT_TABLE_ROWS_LIST[row][4]),
                     html.Td(
-                        dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{input_table_rows_list[row][0]}/{input_table_rows_list[row][4]}')
+                        dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{INPUT_TABLE_ROWS_LIST[row][0]}/{INPUT_TABLE_ROWS_LIST[row][4]}')
                     ),
                 ]))
 
     if nclicks != 0:
         btn_obj = dbc.Button('Clear Table', color='light', className='mr-1', id='clear_input_table', n_clicks=0)
 
-        input_table_rows_list = []
+        INPUT_TABLE_ROWS_LIST = []
 
         table_rows = [
             html.Tr([
@@ -294,19 +334,19 @@ def show_hide_df_input(visibility_state):
     ]
 )
 def add_new_func(pathname, nclicks_delete):
-    global function_number, func_list, new_function_added, process_dict, process_list
+    global FUNCTION_NUMBER, FUNCTION_LIST, NEW_FUNCTION_ADDED, NEW_PROCESS_DICTIONARY, ALL_PROCESS_LIST
     delete_btn = dbc.Button('Delete Function', color='light', className='mr-1', id='delete_func', n_clicks=0)
 
-    if '/eda-page/func-added' in pathname and new_function_added:
-        new_function_added = False
-        function_number += 1
+    if '/eda-page/func-added' in pathname and NEW_FUNCTION_ADDED:
+        NEW_FUNCTION_ADDED = False
+        FUNCTION_NUMBER += 1
 
         new_func = html.Div(
             [
-                html.P([process_dict['dataframe_path']]),
-                html.P([process_dict['eda_process']]),
-                html.P([', '.join(process_dict['column_list'])]),
-                html.P([process_dict['inplace_bool']]),
+                html.P([NEW_PROCESS_DICTIONARY['dataframe_path']]),
+                html.P([NEW_PROCESS_DICTIONARY['eda_process']]),
+                html.P([', '.join(NEW_PROCESS_DICTIONARY['column_list'])]),
+                html.P([NEW_PROCESS_DICTIONARY['inplace_bool']]),
             ],
             style={
                 'width': '100%', 'height': 'auto', 'borderWidth': '1px', 'borderStyle': 'dashed',
@@ -314,17 +354,17 @@ def add_new_func(pathname, nclicks_delete):
             }
         )
 
-        func_list[f'function-{function_number}'] = new_func
-        process_list.append(process_dict)
+        FUNCTION_LIST[f'function-{FUNCTION_NUMBER}'] = new_func
+        ALL_PROCESS_LIST.append(NEW_PROCESS_DICTIONARY)
 
     if nclicks_delete != 0:
         delete_btn = dbc.Button('Delete Function', color='light', className='mr-1', id='delete_func', n_clicks=0)
 
-        del func_list[f'function-{function_number}']
+        del FUNCTION_LIST[f'function-{FUNCTION_NUMBER}']
 
-        function_number -= 1
+        FUNCTION_NUMBER -= 1
 
-    return list(func_list.values()), delete_btn
+    return list(FUNCTION_LIST.values()), delete_btn
 
 
 @app.callback(
@@ -338,8 +378,8 @@ def add_new_func(pathname, nclicks_delete):
     ]
 )
 def update_func_bool(nclicks_input, new_df_bool, select_df, process_select, cols_list):
-    global new_function_added, process_dict
-    new_function_added = True
+    global NEW_FUNCTION_ADDED, NEW_PROCESS_DICTIONARY
+    NEW_FUNCTION_ADDED = True
 
     new_func_process_dict = {
         'dataframe_path': select_df,
@@ -348,7 +388,7 @@ def update_func_bool(nclicks_input, new_df_bool, select_df, process_select, cols
         'inplace_bool': new_df_bool
     }
 
-    process_dict = new_func_process_dict
+    NEW_PROCESS_DICTIONARY = new_func_process_dict
 
     return nclicks_input
 
@@ -395,13 +435,13 @@ def select_dataframe(select_df_value):
     ]
 )
 def execute_process_list(nclicks):
-    global process_list
+    global ALL_PROCESS_LIST
 
     exec_btn = dbc.Button('Execute Functions', color='light', className='mr-1', id='exec_func_list', n_clicks=0)
     badge_obj_success = dbc.Badge("Success", pill=True, color="success", className="mr-1", id='success_badge', style={'display': 'block'})
     badge_obj_info = dbc.Badge("Not Executed", pill=True, color="info", className="mr-1", id='info_badge', style={'display': 'block'})
 
-    for process in process_list:
+    for process in ALL_PROCESS_LIST:
         func = config['process_function_mapping'][process['eda_process']]
 
         print(func())
