@@ -1,0 +1,51 @@
+@app.callback(
+    [
+        Output('eda_func_content', 'children'),
+        Output('add_func_btn_div', 'children')
+    ],
+    [
+        Input('add_func', 'n_clicks'),
+        Input('eda_func_content', 'children')
+    ]
+)
+def add_new_func(nclicks, eda_func_rows):
+    global function_number
+    add_func_btn = dbc.Button('Add New Function', color='light', className='mr-1', id='add_func', n_clicks=0)
+
+    if nclicks != 0:
+        function_number += 1
+        add_func_btn = dbc.Button('Add New Function', color='light', className='mr-1', id='add_func', n_clicks=0)
+
+        new_func = html.Div(
+            [
+                html.Div([
+                    dbc.Button(f'Add New Function - {function_number}', color='Dark', className='mr-1'),
+                ]),
+            ],
+            style={
+                'width': '100%', 'height': '60px', 'lineHeight': '60px', 'borderWidth': '1px', 'borderStyle': 'dashed',
+                'borderRadius': '5px', 'textAlign': 'center', 'margin': '10px'
+            }
+        )
+
+        new_row = html.Div(
+            [
+                html.Div([
+                    dbc.Button('Add New Function', color='light', className='mr-1', id='add_func', n_clicks=0),
+                ], id='add_func_btn_div'),
+            ],
+            style={
+                'width': '100%', 'height': '60px', 'lineHeight': '60px', 'borderWidth': '1px', 'borderStyle': 'dashed',
+                'borderRadius': '5px', 'textAlign': 'center', 'margin': '10px'
+            }
+        )
+
+        print('--------------------------')
+        print(eda_func_rows)
+        print()
+        print(new_func)
+        print('--------------------------')
+
+        eda_func_rows.append(new_func)
+
+        return eda_func_rows, add_func_btn
