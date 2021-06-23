@@ -55,6 +55,7 @@ app.config.suppress_callback_exceptions = True
 
 server = app.server
 
+
 INPUT_TABLE_ROWS_LIST = []
 MAPPING_TABLE_ROWS_LIST = []
 
@@ -94,7 +95,7 @@ app.layout = html.Div([
             dbc.Col([], width=1)
         ], className='mt-5, mr-5')
     ], fluid=True, className='mr-5 ml-5')
-], style={'background-color': '#e2eee5', 'height': '100vh'})
+], style={'background-color': '#e2eee5', 'height': '120vh'})
 
 
 @app.callback(
@@ -116,76 +117,95 @@ def update_mapping_table(list_of_contents, nclicks, list_of_names, list_of_dates
 
     table_header = [
         html.Thead(html.Tr([
-            html.Th('Sr.No.'),
-            html.Th('File Name'),
-            html.Th('Date Uploaded'),
-            html.Th('Content Type'),
-            html.Th('File Type'),
-            html.Th('Sneek Peek'),
-        ]))
+            html.Th('Sr. No.', style={'textAlign': 'center'}),
+            html.Th('File Name', style={'textAlign': 'center'}),
+            html.Th('Date Uploaded', style={'textAlign': 'center'}),
+            html.Th('Content Type', style={'textAlign': 'center'}),
+            html.Th('File Type', style={'textAlign': 'center'}),
+            html.Th('Sneek Peek', style={'textAlign': 'center'}),
+        ], style={'font-size': '1.4rem', 'font-style': 'italic', 'font-weight': 'bold'}))
     ]
 
-    btn_obj = dbc.Button('Clear Table', color='light', className='mr-1', id='clear_mapping_table', n_clicks=0)
+    btn_obj = dbc.Button(
+        'Clear Table', color='warning', className='mr-1', id='clear_mapping_table', n_clicks=0, style={'height': 'auto'}
+    )
 
     table_rows = []
 
     if list_of_contents is not None:
-        for sr_no, contents, filename, date in zip(list(range(len(list_of_contents))), list_of_contents, list_of_names, list_of_dates):
+        for sr_no, contents, filename, date in zip(
+            list(range(len(list_of_contents))), list_of_contents, list_of_names, list_of_dates
+        ):
             MAPPING_TABLE_ROWS_LIST.append(parse_contents(contents, filename, date))
 
             MAPPING_TABLE_ROWS_LIST[sr_no][2].to_csv(Path('media/mapping_files/', filename), index=False)
 
             table_rows.append(html.Tr([
-                html.Td(sr_no),
-                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][0]),
-                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][1]),
-                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][3]),
-                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][4]),
+                html.Td(sr_no, style={'textAlign': 'center'}),
+                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][0], style={'textAlign': 'center'}),
+                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][1], style={'textAlign': 'center'}),
+                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][3], style={'textAlign': 'center'}),
+                html.Td(MAPPING_TABLE_ROWS_LIST[sr_no][4], style={'textAlign': 'center'}),
                 html.Td(
-                    dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{MAPPING_TABLE_ROWS_LIST[sr_no][0]}/{MAPPING_TABLE_ROWS_LIST[sr_no][4]}')
+                    dcc.Link(
+                        dbc.Button('View File', color='success', style={'height': 'auto'}),
+                        href=f'/dashboard/mapping/{MAPPING_TABLE_ROWS_LIST[sr_no][0]}/{MAPPING_TABLE_ROWS_LIST[sr_no][4]}'
+                    ),
+                    style={'textAlign': 'center'}
                 ),
-            ]))
+            ], style={'font-size': '1.2rem'}))
     else:
         if MAPPING_TABLE_ROWS_LIST == []:
             table_rows.append(html.Tr([
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-            ]))
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+            ], style={'font-size': '1.2rem'}))
         else:
             for row in range(len(MAPPING_TABLE_ROWS_LIST)):
                 table_rows.append(html.Tr([
-                    html.Td(row),
-                    html.Td(MAPPING_TABLE_ROWS_LIST[row][0]),
-                    html.Td(MAPPING_TABLE_ROWS_LIST[row][1]),
-                    html.Td(MAPPING_TABLE_ROWS_LIST[row][3]),
-                    html.Td(MAPPING_TABLE_ROWS_LIST[row][4]),
+                    html.Td(row, style={'textAlign': 'center'}),
+                    html.Td(MAPPING_TABLE_ROWS_LIST[row][0], style={'textAlign': 'center'}),
+                    html.Td(MAPPING_TABLE_ROWS_LIST[row][1], style={'textAlign': 'center'}),
+                    html.Td(MAPPING_TABLE_ROWS_LIST[row][3], style={'textAlign': 'center'}),
+                    html.Td(MAPPING_TABLE_ROWS_LIST[row][4], style={'textAlign': 'center'}),
                     html.Td(
-                        dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{MAPPING_TABLE_ROWS_LIST[row][0]}/{MAPPING_TABLE_ROWS_LIST[row][4]}')
+                        dcc.Link(
+                            dbc.Button('View File', color='success', style={'height': 'auto'}),
+                            href=f'/dashboard/mapping/{MAPPING_TABLE_ROWS_LIST[row][0]}/{MAPPING_TABLE_ROWS_LIST[row][4]}'
+                        ),
+                        style={'textAlign': 'center'}
                     ),
-                ]))
+                ], style={'font-size': '1.2rem'}))
 
     if nclicks != 0:
-        btn_obj = dbc.Button('Clear Table', color='light', className='mr-1', id='clear_mapping_table', n_clicks=0)
+        btn_obj = dbc.Button(
+            'Clear Table', color='warning', className='mr-1', id='clear_mapping_table', n_clicks=0, style={'height': 'auto'}
+        )
 
         MAPPING_TABLE_ROWS_LIST = []
 
         table_rows = [
             html.Tr([
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-            ])
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+            ], style={'font-size': '1.2rem'})
         ]
 
     table_body = [html.Tbody(table_rows)]
-    table = dbc.Table(table_header + table_body, bordered=True, dark=True, hover=True, responsive=True, striped=True, id='data_table')
+
+    table = dbc.Table(
+        table_header + table_body,
+        bordered=True, dark=False, hover=True, responsive=True, striped=True,
+        id='data_table'
+    )
 
     return table, btn_obj
 
@@ -209,57 +229,70 @@ def update_input_table(list_of_contents, nclicks, list_of_names, list_of_dates):
 
     table_header = [
         html.Thead(html.Tr([
-            html.Th('Sr.No.'),
-            html.Th('File Name'),
-            html.Th('Date Uploaded'),
-            html.Th('Content Type'),
-            html.Th('File Type'),
-            html.Th('Sneek Peek'),
-        ]))
+            html.Th('Sr. No.', style={'textAlign': 'center'}),
+            html.Th('File Name', style={'textAlign': 'center'}),
+            html.Th('Date Uploaded', style={'textAlign': 'center'}),
+            html.Th('Content Type', style={'textAlign': 'center'}),
+            html.Th('File Type', style={'textAlign': 'center'}),
+            html.Th('Sneek Peek', style={'textAlign': 'center'}),
+        ], style={'font-size': '1.4rem', 'font-style': 'italic', 'font-weight': 'bold'}))
     ]
 
-    btn_obj = dbc.Button('Clear Table', color='light', className='mr-1', id='clear_input_table', n_clicks=0)
+    btn_obj = dbc.Button(
+        'Clear Table', color='warning', className='mr-1', id='clear_input_table', n_clicks=0, style={'height': 'auto'}
+    )
 
     table_rows = []
 
     if list_of_contents is not None:
-        for sr_no, contents, filename, date in zip(list(range(len(list_of_contents))), list_of_contents, list_of_names, list_of_dates):
+        for sr_no, contents, filename, date in zip(
+            list(range(len(list_of_contents))), list_of_contents, list_of_names, list_of_dates
+        ):
             INPUT_TABLE_ROWS_LIST.append(parse_contents(contents, filename, date))
 
             INPUT_TABLE_ROWS_LIST[sr_no][2].to_csv(Path('media/csv_files/', filename), index=False)
 
             table_rows.append(html.Tr([
-                html.Td(sr_no),
-                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][0]),
-                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][1]),
-                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][3]),
-                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][4]),
+                html.Td(sr_no, style={'textAlign': 'center'}),
+                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][0], style={'textAlign': 'center'}),
+                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][1], style={'textAlign': 'center'}),
+                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][3], style={'textAlign': 'center'}),
+                html.Td(INPUT_TABLE_ROWS_LIST[sr_no][4], style={'textAlign': 'center'}),
                 html.Td(
-                    dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{INPUT_TABLE_ROWS_LIST[sr_no][0]}/{INPUT_TABLE_ROWS_LIST[sr_no][4]}')
+                    dcc.Link(
+                        dbc.Button('View File', color='success', style={'height': 'auto'}),
+                        href=f'/dashboard/input/{INPUT_TABLE_ROWS_LIST[sr_no][0]}/{INPUT_TABLE_ROWS_LIST[sr_no][4]}'
+                    ),
+                    style={'textAlign': 'center'}
                 ),
-            ]))
+            ], style={'font-size': '1.2rem'}))
+
     else:
         if INPUT_TABLE_ROWS_LIST == []:
             table_rows.append(html.Tr([
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-            ]))
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+            ], style={'font-size': '1.2rem'}))
         else:
             for row in range(len(INPUT_TABLE_ROWS_LIST)):
                 table_rows.append(html.Tr([
-                    html.Td(row),
-                    html.Td(INPUT_TABLE_ROWS_LIST[row][0]),
-                    html.Td(INPUT_TABLE_ROWS_LIST[row][1]),
-                    html.Td(INPUT_TABLE_ROWS_LIST[row][3]),
-                    html.Td(INPUT_TABLE_ROWS_LIST[row][4]),
+                    html.Td(row, style={'textAlign': 'center'}),
+                    html.Td(INPUT_TABLE_ROWS_LIST[row][0], style={'textAlign': 'center'}),
+                    html.Td(INPUT_TABLE_ROWS_LIST[row][1], style={'textAlign': 'center'}),
+                    html.Td(INPUT_TABLE_ROWS_LIST[row][3], style={'textAlign': 'center'}),
+                    html.Td(INPUT_TABLE_ROWS_LIST[row][4], style={'textAlign': 'center'}),
                     html.Td(
-                        dcc.Link(dbc.Button('View File', color='success'), href=f'/dashboard/{INPUT_TABLE_ROWS_LIST[row][0]}/{INPUT_TABLE_ROWS_LIST[row][4]}')
+                        dcc.Link(
+                            dbc.Button('View File', color='success', style={'height': 'auto'}),
+                            href=f'/dashboard/input/{INPUT_TABLE_ROWS_LIST[row][0]}/{INPUT_TABLE_ROWS_LIST[row][4]}'
+                        ),
+                        style={'textAlign': 'center'}
                     ),
-                ]))
+                ], style={'font-size': '1.2rem'}))
 
     if nclicks != 0:
         btn_obj = dbc.Button('Clear Table', color='light', className='mr-1', id='clear_input_table', n_clicks=0)
@@ -268,17 +301,22 @@ def update_input_table(list_of_contents, nclicks, list_of_names, list_of_dates):
 
         table_rows = [
             html.Tr([
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-                html.Td('Empty Cell'),
-            ])
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+                html.Td('Empty Cell', style={'textAlign': 'center'}),
+            ], style={'font-size': '1.2rem'})
         ]
 
     table_body = [html.Tbody(table_rows)]
-    table = dbc.Table(table_header + table_body, bordered=True, dark=True, hover=True, responsive=True, striped=True, id='data_table')
+
+    table = dbc.Table(
+        table_header + table_body,
+        bordered=True, dark=False, hover=True, responsive=True, striped=True,
+        id='data_table'
+    )
 
     return table, btn_obj
 
@@ -294,10 +332,14 @@ def change_layout_view(pathname):
         return eda_layout
 
     elif '/dashboard' in pathname:
-        file_name = pathname.split('/')[2]
-        ext = pathname.split('/')[3]
+        file_category = pathname.split('/')[2]
+        file_name = pathname.split('/')[3]
+        ext = pathname.split('/')[4]
 
-        dataframe = pd.read_csv(f'media/csv_files/{file_name}.{ext}')
+        if file_category == 'input':
+            dataframe = pd.read_csv(f'media/csv_files/{file_name}.{ext}')
+        else:
+            dataframe = pd.read_csv(f'media/mapping_files/{file_name}.{ext}')
 
         return get_sneek_peek_layout(dataframe)
 

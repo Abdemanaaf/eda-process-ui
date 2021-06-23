@@ -26,6 +26,6 @@ top_navbar_layout = dbc.NavbarSimple(
         dbc.NavItem(dbc.NavLink('Data Visualization (Graphs)', href='/data-visualization'), className='mr-5 mt-2'),
         dbc.NavItem(dbc.NavLink('Contact Us', href='/contact-us', className='mt-2'))
     ],
-    brand='EASE EDA', brand_href='/', color='dark', dark=True, fixed='top', sticky='top', style={'font-size': '1.4rem'},
+    brand='EASE EDA (Data Analysis and Visualization)', brand_href='/', color='dark', dark=True, fixed='top', sticky='top', style={'font-size': '1.4rem'},
     brand_style={'font-size': '1.5rem'}
 )
