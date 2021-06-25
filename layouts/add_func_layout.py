@@ -33,6 +33,12 @@ df_select_opt = [{"label": "----Input Files", "disabled": True}] + \
     mapping_dict
 
 
+eda_process_list = [{"label": "----Basic Functions", "disabled": True}] + \
+    [{'label': label, 'value': label} for label in config['eda_process_list']] + \
+    [{"label": "----Advance Functions", "disabled": True}] + \
+    [{'label': label, 'value': label} for label in config['adv_eda_process_list']]
+
+
 radioitems = dbc.FormGroup(
     [
         dbc.Label("Choose one"),
@@ -60,10 +66,8 @@ select = dbc.Select(
 
 select_eda_process = dbc.Select(
     id="select_eda_process",
-    options=[{'label': label, 'value': label} for label in config['eda_process_list']]
+    options=eda_process_list
 )
-
-
 
 
 add_func_layout = dbc.Container([

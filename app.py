@@ -61,16 +61,38 @@ MAPPING_TABLE_ROWS_LIST = []
 
 FUNCTION_NUMBER = 0
 FUNCTION_LIST = {
-    'add_new_row': html.Div(
-        [
-            dcc.Link(
-                dbc.Button('Add New Function', color='light', className='mr-1', id='add_func', n_clicks=0),
-                href='/add-function'
-            ),
+    'add_new_row': html.Div([
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.H1(['00'],
+                            style={'font-size': '60px'}
+                        )
+                    ], style={'margin': 'auto auto'})
+                ], width=2, className='ml-5'),
+
+                dbc.Col([
+                    html.H3(['Input File']),
+                    html.Hr(style={'width': '70%'}),
+                    html.H4(['EDA Process Name: --NA--']),
+                    html.H4(['File Name: --NA--']),
+                    html.H4(['Number of Columns: --NA--']),
+                    html.H4(['Inplace (True/False): --NA--'])
+                ], className='mt-4 mb-4'),
+
+                dbc.Col([
+                    html.H3(['Mapping File']),
+                    html.Hr(style={'width': '70%'}),
+                    html.H4(['EDA Process Name: --NA--']),
+                    html.H4(['File Name: --NA--']),
+                    html.H4(['Number of Columns: --NA--']),
+                    html.H4(['Inplace (True/False): --NA--'])
+                ], className='mt-4 mb-4')
+            ])
         ],
         style={
-            'width': '100%', 'height': '60px', 'lineHeight': '60px', 'borderWidth': '1px', 'borderStyle': 'dashed',
-            'borderRadius': '5px', 'textAlign': 'center', 'margin': '10px'
+            'width': '100%', 'height': 'auto', 'lineHeight': '60px', 'borderWidth': '1px', 'borderStyle': 'solid',
+            'borderRadius': '10px', 'margin': '0 auto', 'background-color': 'white'
         }
     )
 }
@@ -78,6 +100,8 @@ FUNCTION_LIST = {
 NEW_FUNCTION_ADDED = False
 NEW_PROCESS_DICTIONARY = {}
 ALL_PROCESS_LIST = []
+
+FUNCTION_EXEC_LIST = []
 
 
 app.layout = html.Div([
@@ -295,7 +319,9 @@ def update_input_table(list_of_contents, nclicks, list_of_names, list_of_dates):
                 ], style={'font-size': '1.2rem'}))
 
     if nclicks != 0:
-        btn_obj = dbc.Button('Clear Table', color='light', className='mr-1', id='clear_input_table', n_clicks=0)
+        btn_obj = dbc.Button(
+            'Clear Table', color='warning', className='mr-1', id='clear_input_table', n_clicks=0, style={'height': 'auto'}
+        )
 
         INPUT_TABLE_ROWS_LIST = []
 
@@ -377,34 +403,73 @@ def show_hide_df_input(visibility_state):
 )
 def add_new_func(pathname, nclicks_delete):
     global FUNCTION_NUMBER, FUNCTION_LIST, NEW_FUNCTION_ADDED, NEW_PROCESS_DICTIONARY, ALL_PROCESS_LIST
-    delete_btn = dbc.Button('Delete Function', color='light', className='mr-1', id='delete_func', n_clicks=0)
+    delete_btn = dbc.Button('Delete Function', color='danger', className='mr-1', id='delete_func', n_clicks=0, style={'width': '80%'})
 
     if '/eda-page/func-added' in pathname and NEW_FUNCTION_ADDED:
         NEW_FUNCTION_ADDED = False
         FUNCTION_NUMBER += 1
 
-        new_func = html.Div(
-            [
-                html.P([NEW_PROCESS_DICTIONARY['dataframe_path']]),
-                html.P([NEW_PROCESS_DICTIONARY['eda_process']]),
-                html.P([', '.join(NEW_PROCESS_DICTIONARY['column_list'])]),
-                html.P([NEW_PROCESS_DICTIONARY['inplace_bool']]),
+        file_name = NEW_PROCESS_DICTIONARY['dataframe_path'].split('\\')[1].split('.')[0]
+        eda_process = NEW_PROCESS_DICTIONARY['eda_process']
+        column_list = ', '.join(NEW_PROCESS_DICTIONARY['column_list'])
+
+        column_len = 0
+        if 'All Columns' in NEW_PROCESS_DICTIONARY['column_list']:
+            df = pd.read_csv(NEW_PROCESS_DICTIONARY['dataframe_path'])
+            column_len = str(len(df.columns)) + ' (All)'
+        else:
+            column_len = len(NEW_PROCESS_DICTIONARY['column_list'])
+
+        if eda_process in ['Drop NA Values', 'Drop Duplicate Values']:
+
+            new_func = html.Div([
+                dbc.Row([
+                    dbc.Col([
+                        html.Div([
+                            html.H1([f'{str(FUNCTION_NUMBER).zfill(2)}'],
+                                style={'font-size': '60px'}
+                            )
+                        ], style={'margin': 'auto auto'})
+                    ], width=2, className='ml-5'),
+
+                    dbc.Col([
+                        html.H3(['Input File']),
+                        html.Hr(style={'width': '70%'}),
+                        html.H4([f'EDA Process Name: {eda_process}']),
+                        html.H4([f'File Name: {file_name}']),
+                        html.H4([f'Number of Columns: {column_len}']),
+                        html.H4([f'Inplace (True/False): {bool(NEW_PROCESS_DICTIONARY["inplace_bool"])}'])
+                    ], className='mt-4 mb-4'),
+
+                    dbc.Col([
+                        html.H3(['Mapping File']),
+                        html.Hr(style={'width': '70%'}),
+                        html.H4([f'EDA Process Name: --NA--']),
+                        html.H4([f'File Name: --NA--']),
+                        html.H4([f'Number of Columns: --NA--']),
+                        html.H4([f'Inplace (True/False): --NA--'])
+                    ], className='mt-4 mb-4')
+                ])
             ],
             style={
-                'width': '100%', 'height': 'auto', 'borderWidth': '1px', 'borderStyle': 'dashed',
-                'borderRadius': '5px', 'textAlign': 'center', 'margin': '10px'
-            }
+                'width': '100%', 'height': 'auto', 'lineHeight': '60px', 'borderWidth': '1px', 'borderStyle': 'solid',
+                'borderRadius': '10px', 'margin': '0 auto', 'background-color': 'white'
+            },
+            className='mt-5'
         )
 
-        FUNCTION_LIST[f'function-{FUNCTION_NUMBER}'] = new_func
+            FUNCTION_LIST[f'function-{FUNCTION_NUMBER}'] = new_func
         ALL_PROCESS_LIST.append(NEW_PROCESS_DICTIONARY)
 
     if nclicks_delete != 0:
-        delete_btn = dbc.Button('Delete Function', color='light', className='mr-1', id='delete_func', n_clicks=0)
+        delete_btn = dbc.Button('Delete Function', color='danger', className='mr-1', id='delete_func', n_clicks=0, style={'width': '80%'})
 
         del FUNCTION_LIST[f'function-{FUNCTION_NUMBER}']
 
         FUNCTION_NUMBER -= 1
+
+    if FUNCTION_NUMBER > 0:
+        return list(FUNCTION_LIST.values())[1:], delete_btn
 
     return list(FUNCTION_LIST.values()), delete_btn
 
@@ -461,9 +526,9 @@ def select_dataframe(select_df_value):
             multi=True
         )
 
-        return [html.Div(['Select Columns', select_columns])]
+        return [html.Div(['Select Columns (Subset)', select_columns])]
 
-    return [html.Div(['Select Columns', select_columns])]
+    return [html.Div(['Select Columns (Subset)', select_columns])]
 
 
 @app.callback(
@@ -477,22 +542,40 @@ def select_dataframe(select_df_value):
     ]
 )
 def execute_process_list(nclicks):
-    global ALL_PROCESS_LIST
+    global ALL_PROCESS_LIST, FUNCTION_EXEC_LIST
+
+    print(ALL_PROCESS_LIST)
 
     exec_btn = dbc.Button('Execute Functions', color='light', className='mr-1', id='exec_func_list', n_clicks=0)
-    badge_obj_success = dbc.Badge("Success", pill=True, color="success", className="mr-1", id='success_badge', style={'display': 'block'})
-    badge_obj_info = dbc.Badge("Not Executed", pill=True, color="info", className="mr-1", id='info_badge', style={'display': 'block'})
 
+    badge_obj_success = dbc.Badge("Success", pill=True, color="success", className="mt-3", id='success_badge', style={'display': 'block', 'width': '40%'})
+    badge_obj_info = dbc.Badge("Not Executed", pill=True, color="info", className="mt-3", id='info_badge', style={'display': 'block', 'width': '40%'})
+
+    FUNCTION_EXEC_LIST = []
     for process in ALL_PROCESS_LIST:
         func = config['process_function_mapping'][process['eda_process']]
 
-        print(func())
+        FUNCTION_EXEC_LIST.append(func(
+            process['dataframe_path'],
+            process['column_list'],
+            process['inplace_bool'],
+            'random_file_name',
+        ))
 
     if nclicks != 0:
         time.sleep(2)
         return [badge_obj_success], exec_btn, False
     else:
         return [badge_obj_info], exec_btn, True
+
+
+@app.callback(
+    Output('output_div', 'children'),
+    Input('output_div', 'children')
+)
+def show_output(output_div_children):
+    print(FUNCTION_EXEC_LIST)
+    return 'FUNCTION_EXEC_LIST'
 
 
 if __name__ == '__main__':
